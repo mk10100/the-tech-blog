@@ -1,22 +1,101 @@
 const express = require("express");
-const { engine } = require("express-handlebars");
-const path = require("path");
-const allRoutes = require("./controllers/allRoutes");
+const session = require("express-session");
+const Sequelize = require("sequelize");
+const SequelizeStore = require("connect-session-sequelize")(session.Store);
+const allRoutes = require("./controllers");
+const exphbs = require("express-handlebars");
+const sequelize = require("./config/connection");
+const bodyParser = require("body-parser");
+const PORT = 3000 || process.env.PORT;
+require("dotenv").config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-app.engine(
-  "handlebars",
-  engine({
-    defaultLayout: "main", // Assuming main.handlebars is your main layout
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+app.use((req, res, next) => {
+  if (req.body && req.body._method === "PUT") {
+    req.method = "PUT";
+  }
+
+  if (req.body && req.body._method === "DELETE") {
+    req.method = "DELETE";
+    req.url = req.path;
+    console.log("req.url", req.url);
+    console.log("req.path", req.path);
+  }
+  next();
+});
+
+app.use(express.static("public"));
+app.engine("handlebars", exphbs.engine());
+app.set("view engine", "handlebars");
+
+const authMiddleware = (req, res, next) => {
+  res.locals.isAuthenticated = req.session.userId ? true : false;
+  next();
+};
+
+const sessionExpiredMiddleware = (req, res, next) => {
+  if (!req.session.userId) {
+    return res.status(401).json({ sessionExpired: true });
+  }
+  next();
+};
+
+const createDatabase = async () => {
+  const tempSequelize = new Sequelize(
+    "",
+    process.env.DB_USER,
+    process.env.DB_PASS,
+    {
+      host: "localhost",
+      dialect: "mysql",
+    }
+  );
+
+  try {
+    await tempSequelize.query("CREATE DATABASE IF NOT EXISTS `blog_db`;");
+    console.log("Database created successfully.");
+  } catch (error) {
+    console.error("Error creating database:", error);
+    throw error;
+  } finally {
+    await tempSequelize.close();
+  }
+};
+
+app.use(
+  session({
+    secret: "secret",
+    store: new SequelizeStore({
+      db: sequelize,
+    }),
+    resave: false,
+    saveUninitialized: false,
   })
 );
 
-app.set("view engine", "handlebars");
-app.set("views", path.join(__dirname, "views"));
-app.use("/", allRoutes);
+app.use(authMiddleware);
+app.use("/auth/expired", sessionExpiredMiddleware);
+app.use(allRoutes);
 
-app.listen(PORT, function () {
-  console.log("App listening on PORT " + PORT);
-});
+createDatabase()
+  .then(() => {
+    sequelize
+      .sync({ force: false })
+      .then(() => {
+        app.listen(PORT, function () {
+          console.log("App listening on PORT " + PORT);
+        });
+      })
+      .catch(function (error) {
+        console.error("An error occurred while syncing the database:", error);
+      });
+  })
+  .catch(function (error) {
+    console.error("An error occurred:", error);
+  });

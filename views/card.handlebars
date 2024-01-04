@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>New Post</title>
+</head>
+
+<body>
+  <div class="card">
+    {{#if isCreator}}
+    <div class="card-controls">
+      <form action="/post/edit/{{post.id}}" method="get">
+        <button type="submit" class="edit-button">Edit</button>
+      </form>
+      <form id="commentForm" action="/api/post/{{post.id}}" method="POST">
+        <input type="hidden" name="_method" value="DELETE">
+        <button type="submit" class="delete-button">Delete</button>
+      </form>
+    </div>
+    {{/if}}
+    <h2 class="card-title">{{post.title}}</h2>
+    <p class="card-content">{{post.content}}</p>
+
+    <div class="input-container">
+      <form id="commentForm" action="/api/comments/{{post.id}}" method="POST">
+        <input type="text" name="content" placeholder="Enter something..." class="input-box">
+        <button type="submit" class="comment-button">Comment</button>
+      </form>
+    </div>
+    <div class="comments-container" id="commentsContainer">
+      {{#if post.Comments}}
+      {{#each post.Comments}}
+      <div class="comment-border">
+        <p>{{this.user.username}}: {{this.content}}</p>
+      </div>
+      {{/each}}
+      {{/if}}
+    </div>
+
+</body>
+
+</html>

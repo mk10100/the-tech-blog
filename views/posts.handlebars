@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Posts</title>
+    <!-- Add any additional head content here -->
+</head>
+<body>
+    <h1>Posts</h1>
+    {{#each posts as |post|}}
+      <a href="/post/{{post.id}}">
+        <div class="post">
+            <h2 class="post-title">{{post.title}}</h2>
+          <p class="post-content">{{post.content}}</p>
+          <p class="post-author">Author: {{post.User.username}}</p>
+        </div>
+      </a>
+    {{/each}}
+</body>
+</html>

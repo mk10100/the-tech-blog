@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>New Post</title>
+</head>
+
+<body>
+  {{#if post.id}}
+  <h1>Edit Post</h1>
+  <form action="/api/post/update" method="post" class="form-wrapper">
+    <input type="hidden" name="_method" value="PUT">
+    <input type="hidden" name="id" value="{{post.id}}">
+
+    <label for="title" class="form-label">Title:</label>
+    <input type="text" id="title" name="title" value="{{post.title}}" required class="form-input">
+
+    <label for="content" class="form-label">Content:</label>
+    <textarea id="content" name="content" required class="form-textarea">{{post.content}}</textarea>
+
+    <button type="submit" class="form-button">Update Post</button>
+  </form>
+  {{else}}
+  <h1>New Post</h1>
+  <form action="/api/post" method="POST" class="form-wrapper">
+    <label for="title" class="form-label">Title:</label>
+    <input type="text" id="title" name="title" required class="form-input">
+
+    <label for="content" class="form-label">Content:</label>
+    <textarea id="content" name="content" required class="form-textarea"></textarea>
+    <button type="submit" class="form-button">Save</button>
+  </form>
+  {{/if}}
+
+</body>
+
+</html>

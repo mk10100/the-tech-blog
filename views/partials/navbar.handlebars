@@ -1,0 +1,24 @@
+<nav class="navbar">
+  <div class="navbar-left">
+    <a class="navbar-brand" href="/">Tech Blog</a>
+  </div>
+  <div class="navbar-right">
+    {{#if isAuthenticated}}
+    <a class="nav-btn" href="/posts">Dashboard</a>
+    <a class="nav-btn" href="/post">New Post</a>
+    <a class="nav-btn" href="#" onclick="confirmLogout()">Log Out</a>
+    {{else}}
+    <a href="/login">Login</a>
+    <a href="/signup">Sign Up</a>
+    {{/if}}
+  </div>
+</nav>
+
+<script>
+  function confirmLogout() {
+    if (confirm('Are you sure you want to log out?')) {
+      fetch('/auth/logout', { method: 'POST' })
+        .then(() => window.location.replace('/'));
+    }
+  }
+</script>
