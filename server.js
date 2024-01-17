@@ -6,7 +6,7 @@ const allRoutes = require("./controllers");
 const exphbs = require("express-handlebars");
 const sequelize = require("./config/connection");
 const bodyParser = require("body-parser");
-const PORT = 3000 || process.env.PORT;
+const PORT = process.env.PORT || 3000;
 require("dotenv").config();
 
 const app = express();
@@ -52,7 +52,7 @@ const createDatabase = async () => {
     process.env.DB_USER,
     process.env.DB_PASS,
     {
-      host: "localhost",
+      host: process.env.HOST,
       dialect: "mysql",
     }
   );
