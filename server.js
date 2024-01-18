@@ -1,6 +1,5 @@
 const express = require("express");
 const session = require("express-session");
-const Sequelize = require("sequelize");
 const SequelizeStore = require("connect-session-sequelize")(session.Store);
 const allRoutes = require("./controllers");
 const exphbs = require("express-handlebars");
@@ -61,13 +60,15 @@ app.use(authMiddleware);
 app.use("/auth/expired", sessionExpiredMiddleware);
 app.use(allRoutes);
 
-sequelize
-  .sync({ force: false })
+// Synchronize Sequelize models with the database
+sequelize.sync({ force: false })
   .then(() => {
-    app.listen(PORT, function () {
-      console.log("App listening on PORT " + PORT);
-    });
+    console.log('Database synchronized successfully');
   })
-  .catch(function (error) {
-    console.error("An error occurred while syncing the database:", error);
+  .catch((error) => {
+    console.error('An error occurred while syncing the database:', error);
   });
+
+app.listen(PORT, function () {
+  console.log("App listening on PORT " + PORT);
+});
