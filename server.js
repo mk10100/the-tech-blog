@@ -46,28 +46,6 @@ const sessionExpiredMiddleware = (req, res, next) => {
   next();
 };
 
-const createDatabase = async () => {
-  const tempSequelize = new Sequelize(
-    "",
-    process.env.DB_USER,
-    process.env.DB_PASS,
-    {
-      host: process.env.HOST,
-      dialect: "mysql",
-    }
-  );
-
-  try {
-    await tempSequelize.query("CREATE DATABASE IF NOT EXISTS `blog_db`;");
-    console.log("Database created successfully.");
-  } catch (error) {
-    console.error("Error creating database:", error);
-    throw error;
-  } finally {
-    await tempSequelize.close();
-  }
-};
-
 app.use(
   session({
     secret: "secret",
@@ -83,19 +61,13 @@ app.use(authMiddleware);
 app.use("/auth/expired", sessionExpiredMiddleware);
 app.use(allRoutes);
 
-createDatabase()
+sequelize
+  .sync({ force: false })
   .then(() => {
-    sequelize
-      .sync({ force: false })
-      .then(() => {
-        app.listen(PORT, function () {
-          console.log("App listening on PORT " + PORT);
-        });
-      })
-      .catch(function (error) {
-        console.error("An error occurred while syncing the database:", error);
-      });
+    app.listen(PORT, function () {
+      console.log("App listening on PORT " + PORT);
+    });
   })
   .catch(function (error) {
-    console.error("An error occurred:", error);
+    console.error("An error occurred while syncing the database:", error);
   });
