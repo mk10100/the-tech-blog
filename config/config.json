@@ -7,7 +7,7 @@
           "rejectUnauthorized": false
         }
       },
-      "url": "postgres://qfzxdfxwidvfgp:e8a616efe521bd75dda6023d993f4bd9e4191e37795ea243230b52cc4ceebc4c@ec2-3-232-218-211.compute-1.amazonaws.com:5432/d93r063arurrlc"
+      "url": "postgres://uuxikbyfctiupr:e890635c5ab959ed5ac3dfabd6487ee84269a3d4a20ed3dad8154e366459ecce@ec2-44-213-151-75.compute-1.amazonaws.com:5432/ddre18hs4u8ddu"
     }
   }
   
